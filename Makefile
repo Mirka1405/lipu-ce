@@ -9,6 +9,9 @@ CXXFLAGS = -Wall -Wextra -Oz
 DEPS = $(SRCDIR)/dictionary_data.c
 EXTRA_C_SOURCES = $(SRCDIR)/dictionary_data.c
 
+# add 'uncommon' and/or 'obscure' to include more words
+WORD_CATEGORIES = core common
+
 define EXTRA_CLEAN
 	if [ -f src/gfx/convimg.yaml.lst ]; then \
 		xargs -I{} rm -f $(GFXDIR)/{} < src/gfx/convimg.yaml.lst; \
@@ -22,7 +25,7 @@ include $(shell cedev-config --makefile)
 gfx: $(GFXDIR)/sitelen_pona_glyphs.png
 
 word_manifest.json:
-	python3 tools/generate_manifest.py
+	WORD_CATEGORIES="$(WORD_CATEGORIES)" python3 tools/generate_manifest.py
 
 $(SRCDIR)/dictionary_data.c: word_manifest.json
 	python3 tools/generate_dictionary.py

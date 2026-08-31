@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import json
 import tomllib
 from pathlib import Path
@@ -10,6 +11,8 @@ WORDS_META_DIR = SONA_DIR / "words" / "metadata"
 DEFINITIONS_FILE = SONA_DIR / "words" / "source" / "definitions.toml"
 
 def generate_manifest():
+    inclueded_categories = os.getenv("WORD_CATEGORIES", "").split()
+    
     with open(DEFINITIONS_FILE, "rb") as f:
         definitions = tomllib.load(f)
     
@@ -21,6 +24,9 @@ def generate_manifest():
         with open(meta_file, "rb") as f:
             meta = tomllib.load(f)
         
+        if not meta.get("usage_category") in inclueded_categories:
+            continue
+        
         ucsur_hex = meta.get("representations").get("ucsur")
         if not ucsur_hex: continue
         
@@ -29,8 +35,7 @@ def generate_manifest():
         manifest.append({
             "word": word_key,
             "ucsur": codepoint,
-            "definition": definitions.get(word_key, ""),
-            "category": meta.get("usage_category", "obscure")
+            "definition": definitions.get(word_key, "")
         })
     
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
