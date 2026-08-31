@@ -1,7 +1,10 @@
 NAME = LIPUCE
 DESCRIPTION = "lipu CE - toki pona dictionary"
+ICON = icon.png
 
-ARCHIVED = NO
+ARCHIVED = YES
+COMPRESSED = YES
+COMPRESSED_MODE = zx0
 
 CFLAGS = -Wall -Wextra -Oz
 CXXFLAGS = -Wall -Wextra -Oz
