@@ -10,6 +10,8 @@ static uint8_t pressed_key = 0;
 static int selected_word = 0;
 static int wordlist_start_idx = 0;
 
+void redraw(void);
+
 const char *getDefinition(const word_entry_t *entry)
 {
     if (!entry)
@@ -21,18 +23,26 @@ void selectNextWord()
 {
     selected_word++;
     if (selected_word >= g_dictionary.word_count)
-        selected_word = g_dictionary.word_count - 1;
+    {
+        selected_word = 0;
+        wordlist_start_idx = 0;
+    }
     if (selected_word >= wordlist_start_idx + MAX_WORDS_SHOWN)
         wordlist_start_idx++;
+    redraw();
 }
 
 void selectPrevWord()
 {
     selected_word--;
     if (selected_word < 0)
-        selected_word = 0;
+    {
+        selected_word = g_dictionary.word_count - 1;
+        wordlist_start_idx = g_dictionary.word_count - MAX_WORDS_SHOWN;
+    }
     if (selected_word < wordlist_start_idx)
         wordlist_start_idx--;
+    redraw();
 }
 
 void gfx_ScaledRLETSprite_NoClip(const gfx_rletsprite_t *sprite, int x, int y, uint8_t scale_x, uint8_t scale_y)
@@ -87,10 +97,16 @@ void DrawWordInfoBox(const word_entry_t *entry, int y, bool selected)
 {
     // box
     if (selected)
+    {
         gfx_SetColor(0x4A);
+        gfx_Rectangle(BOX_MARGIN, y + BOX_MARGIN, GFX_LCD_WIDTH - BOX_MARGIN * 2, WORD_BOX_HEIGHT - BOX_MARGIN);
+        gfx_Rectangle(BOX_MARGIN - 3, y + BOX_MARGIN - 3, GFX_LCD_WIDTH - (BOX_MARGIN - 3) * 2, WORD_BOX_HEIGHT - (BOX_MARGIN - 6));
+    }
     else
+    {
         gfx_SetColor(0xB5);
-    gfx_Rectangle(BOX_MARGIN, y + BOX_MARGIN, GFX_LCD_WIDTH - BOX_MARGIN * 2, WORD_BOX_HEIGHT - BOX_MARGIN);
+        gfx_Rectangle(BOX_MARGIN, y + BOX_MARGIN, GFX_LCD_WIDTH - BOX_MARGIN * 2, WORD_BOX_HEIGHT - BOX_MARGIN);
+    }
 
     // sitelen pona
     gfx_ScaledRLETSprite_NoClip(sitelen_pona_glyphs_tiles[entry->sp_glyph_id], 10, y + 12, 2, 2);
@@ -105,6 +121,11 @@ void DrawWordInfoBox(const word_entry_t *entry, int y, bool selected)
     gfx_SetClipRegion(0, 0, GFX_LCD_WIDTH - 2 * BOX_MARGIN, GFX_LCD_HEIGHT);
     gfx_PrintString(getDefinition(entry));
     gfx_SetClipRegion(0, 0, GFX_LCD_WIDTH, GFX_LCD_HEIGHT);
+}
+
+void init(void)
+{
+    redraw();
 }
 
 void step(void)
@@ -128,7 +149,7 @@ void step(void)
     }
 }
 
-void draw(void)
+void redraw(void)
 {
     gfx_SetDraw(gfx_buffer);
     gfx_FillScreen(0xFF);
@@ -149,4 +170,4 @@ void draw(void)
     gfx_Blit(gfx_buffer);
 }
 
-const game_state_t STATE_WORDLIST = {NULL, step, draw, NULL};
+const game_state_t STATE_WORDLIST = {init, step, NULL, NULL};
