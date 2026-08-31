@@ -10,6 +10,13 @@ static uint8_t pressed_key = 0;
 static int selected_word = 0;
 static int wordlist_start_idx = 0;
 
+const char *getDefinition(const word_entry_t *entry)
+{
+    if (!entry)
+        return NULL;
+    return g_dictionary.def_string_table + entry->def_offset;
+}
+
 void selectNextWord()
 {
     selected_word++;
@@ -76,7 +83,7 @@ void gfx_ScaledRLETSprite_NoClip(const gfx_rletsprite_t *sprite, int x, int y, u
     }
 }
 
-void DrawWordInfo(const word_entry_t *word, int y, bool selected)
+void DrawWordInfoBox(const word_entry_t *entry, int y, bool selected)
 {
     // box
     if (selected)
@@ -86,11 +93,18 @@ void DrawWordInfo(const word_entry_t *word, int y, bool selected)
     gfx_Rectangle(BOX_MARGIN, y + BOX_MARGIN, GFX_LCD_WIDTH - BOX_MARGIN * 2, WORD_BOX_HEIGHT - BOX_MARGIN);
 
     // sitelen pona
-    gfx_ScaledRLETSprite_NoClip(sitelen_pona_glyphs_tiles[word->sp_glyph_id], 10, y + 12, 2, 2);
+    gfx_ScaledRLETSprite_NoClip(sitelen_pona_glyphs_tiles[entry->sp_glyph_id], 10, y + 12, 2, 2);
 
-    // sitelen Lasina
+    // sitelen Lasina and definition
     gfx_SetTextFGColor(0x00);
-    gfx_PrintStringXY(word->word, 40, y + 18);
+    gfx_SetTextXY(40, y + 19);
+    gfx_PrintString(entry->word);
+
+    gfx_SetTextFGColor(0xB5);
+    gfx_PrintString(" - ");
+    gfx_SetClipRegion(0, 0, GFX_LCD_WIDTH - 2 * BOX_MARGIN, GFX_LCD_HEIGHT);
+    gfx_PrintString(getDefinition(entry));
+    gfx_SetClipRegion(0, 0, GFX_LCD_WIDTH, GFX_LCD_HEIGHT);
 }
 
 void step(void)
@@ -129,7 +143,7 @@ void draw(void)
     for (int i = 0; i < 5; i++)
     {
         int y = WORD_LIST_START_Y + (WORD_BOX_HEIGHT + 2) * i;
-        DrawWordInfo(&g_dictionary.words[wordlist_start_idx + i], y, wordlist_start_idx + i == selected_word);
+        DrawWordInfoBox(&g_dictionary.words[wordlist_start_idx + i], y, wordlist_start_idx + i == selected_word);
     }
 
     gfx_Blit(gfx_buffer);
