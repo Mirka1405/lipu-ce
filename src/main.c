@@ -6,7 +6,6 @@ int main(void)
     gfx_Begin();
 
     // gfx config
-    gfx_SetTextConfig(gfx_text_clip);
     gfx_SetTextTransparentColor(0xE0); // arbitrary unused color
     gfx_SetTextBGColor(0xE0);
 

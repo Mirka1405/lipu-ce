@@ -1,25 +1,17 @@
 #include "state_wordlist.h"
+#include "state_wordoverview.h"
 
 #define WORD_LIST_START_Y 25
 #define WORD_BOX_HEIGHT 40
 #define BOX_MARGIN 5
 #define MAX_WORDS_SHOWN 5
 
-static uint8_t pressed_key = 0;
-
 static int selected_word = 0;
 static int wordlist_start_idx = 0;
 
-void redraw(void);
+static void redraw(void);
 
-const char *getDefinition(const word_entry_t *entry)
-{
-    if (!entry)
-        return NULL;
-    return g_dictionary.def_string_table + entry->def_offset;
-}
-
-void selectNextWord()
+static void selectNextWord(void)
 {
     selected_word++;
     if (selected_word >= g_dictionary.word_count)
@@ -32,7 +24,7 @@ void selectNextWord()
     redraw();
 }
 
-void selectPrevWord()
+static void selectPrevWord(void)
 {
     selected_word--;
     if (selected_word < 0)
@@ -45,55 +37,13 @@ void selectPrevWord()
     redraw();
 }
 
-void gfx_ScaledRLETSprite_NoClip(const gfx_rletsprite_t *sprite, int x, int y, uint8_t scale_x, uint8_t scale_y)
+static void enterCurrentWordOverview(void)
 {
-    const uint8_t *data = sprite->data;
-    uint8_t width = sprite->width;
-    uint8_t height = sprite->height;
-
-    for (uint8_t row = 0; row < height; row++)
-    {
-        uint8_t col = 0;
-        int py = y + row * scale_y;
-
-        while (col < width)
-        {
-            uint8_t skip = *data++;
-            col += skip;
-
-            if (col >= width)
-                break;
-
-            uint8_t count = *data++;
-            uint8_t run_start_col = col;
-            uint8_t i = 0;
-
-            while (i < count)
-            {
-                uint8_t color = data[i];
-                uint8_t run_len = 1;
-                while (i + run_len < count && data[i + run_len] == color)
-                {
-                    run_len++;
-                }
-
-                gfx_SetColor(color);
-                gfx_FillRectangle_NoClip(
-                    x + (run_start_col + i) * scale_x,
-                    py,
-                    run_len * scale_x,
-                    scale_y);
-
-                i += run_len;
-            }
-
-            data += count;
-            col += count;
-        }
-    }
+    state_WordOverview_SetEntry(selected_word);
+    states_EnterState(&STATE_WORDOVERVIEW);
 }
 
-void DrawWordInfoBox(const word_entry_t *entry, int y, bool selected)
+static void DrawWordInfoBox(const word_entry_t *entry, int y, bool selected)
 {
     // box
     if (selected)
@@ -123,13 +73,14 @@ void DrawWordInfoBox(const word_entry_t *entry, int y, bool selected)
     gfx_SetClipRegion(0, 0, GFX_LCD_WIDTH, GFX_LCD_HEIGHT);
 }
 
-void init(void)
+static void init(void)
 {
     redraw();
 }
 
-void step(void)
+static void step(void)
 {
+    static uint8_t pressed_key = 0;
     if ((pressed_key = os_GetCSC()))
     {
         switch (pressed_key)
@@ -143,13 +94,16 @@ void step(void)
         case sk_Up:
             selectPrevWord();
             break;
+        case sk_Enter:
+            enterCurrentWordOverview();
+            break;
         default:
             break;
         }
     }
 }
 
-void redraw(void)
+static void redraw(void)
 {
     gfx_SetDraw(gfx_buffer);
     gfx_FillScreen(0xFF);
@@ -161,6 +115,7 @@ void redraw(void)
     gfx_PrintStringXY("lipu CE", 5, 5);
 
     // draw word list
+    gfx_SetTextConfig(gfx_text_clip);
     for (int i = 0; i < 5; i++)
     {
         int y = WORD_LIST_START_Y + (WORD_BOX_HEIGHT + 2) * i;
