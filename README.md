@@ -7,6 +7,7 @@
 The repo uses python scripts to build the dictionary database and sitelen pona glyphs. To build, `python3` must be in PATH.
 
 ```bash
+git clone --recurse-submodules https://github.com/mstfbil/lipu-ce.git && cd lipu-ce
 pip3 install -r requirements.txt
 make gfx && make
 ```
