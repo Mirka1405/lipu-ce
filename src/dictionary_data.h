@@ -1,5 +1,5 @@
-#ifndef DICTIONARY_DATA_H
-#define DICTIONARY_DATA_H
+#ifndef __DICTIONARY_DATA_H__
+#define __DICTIONARY_DATA_H__
 
 #include <stdint.h>
 
@@ -12,11 +12,11 @@ typedef struct
 
 typedef struct
 {
-    uint16_t word_count;
+    int word_count;
     const word_entry_t *words;
     const char *def_string_table;
 } dictionary_db_t;
 
 extern const dictionary_db_t g_dictionary;
 
-#endif
+#endif // __DICTIONARY_DATA_H__
