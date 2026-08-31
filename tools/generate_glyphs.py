@@ -8,7 +8,7 @@ MANIFEST_PATH = Path("word_manifest.json")
 FONT_PATH = "tools/Fairfax.ttf"
 OUTPUT_PATH = "src/gfx/sitelen_pona_glyphs.png"
 
-GLYPH_WIDTH = 11
+GLYPH_WIDTH = 12
 GLYPH_HEIGHT = 12
 
 with open(MANIFEST_PATH) as f:

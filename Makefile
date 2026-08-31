@@ -7,9 +7,14 @@ CFLAGS = -Wall -Wextra -Oz
 CXXFLAGS = -Wall -Wextra -Oz
 
 DEPS = $(SRCDIR)/dictionary_data.c
+EXTRA_C_SOURCES = $(SRCDIR)/dictionary_data.c
 
 define EXTRA_CLEAN
-	rm -f $(GFXDIR)/sitelen_pona_glyphs.png word_manifest.json $(SRCDIR)/dictionary_data.c
+	if [ -f src/gfx/convimg.yaml.lst ]; then \
+		xargs -I{} rm -f $(GFXDIR)/{} < src/gfx/convimg.yaml.lst; \
+	fi
+	rm -f $(GFXDIR)/sitelen_pona_glyphs.png $(GFXDIR)/convimg.yaml.lst \
+		word_manifest.json $(SRCDIR)/dictionary_data.c
 endef
 
 include $(shell cedev-config --makefile)
