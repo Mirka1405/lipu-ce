@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 MANIFEST_PATH = Path("word_manifest.json")
 
 FONT_PATH = "tools/Fairfax.ttf"
-OUTPUT_PATH = "src/gfx/gen_bitmap_glyphs.c"
+OUTPUT_PATH = "src/bitmap/gen_bitmap_glyphs"
 
 GLYPH_WIDTH = 12
 GLYPH_HEIGHT = 12
@@ -25,19 +25,33 @@ def generate_glyphs():
     # 1bpp bitmap format
     canvas = Image.new('1', (GLYPH_WIDTH, GLYPH_HEIGHT), color=(0))
     draw = ImageDraw.Draw(canvas)
-    t = ""
+    t = f"static const unsigned char bitmap_glyphs[{len(ucsur_chars)}][{BYTES_PER_IMAGE}] = ""{\n"
+    t2 = f"""#ifndef bitmap_include_file
+#define bitmap_include_file
+#ifdef __cplusplus
+extern "C" """"{""""
+#endif
+extern const unsigned char bitmap_glyphs[{len(ucsur_chars)}][{BYTES_PER_IMAGE}];"""
     for i, code in enumerate(ucsur_chars):
         draw.text((0, 0), code, font=font, fill=(1))
         data = canvas.get_flattened_data()
+        draw.rectangle([0,0,GLYPH_WIDTH,GLYPH_HEIGHT],0)
         bitmap = [0]*BYTES_PER_IMAGE
         for byte in range(BYTES_PER_IMAGE):
             for bit in range(8):
                 bitmap[byte]<<=1
                 bitmap[byte]|=data[byte*8 + bit]
 
-        t += f"static const uint8_t bitmap_glyph_{i}[18] = ""{" + ",".join(map(hex,bitmap)) + "};\n"
-    print(t)
-    exit()
+        t += "  {" + ",".join(map(hex,bitmap)) + "},\n"
+    with open(OUTPUT_PATH+".c","w") as f:
+        f.write(t+"};")
+    with open(OUTPUT_PATH+".h","w") as f:
+        f.write(t2+f"""
+#define bitmap_glyphs_len {len(ucsur_chars)}
+#ifdef __cplusplus
+""""}""""
+#endif
+#endif""")
     
     print(f"Succesfully generated bitmap glyphs from font {FONT_PATH}")
     
