@@ -5,4 +5,3 @@ obj
 .DS_Store
 word_manifest.json
 src/dictionary_data.c
-src/gfx/*
