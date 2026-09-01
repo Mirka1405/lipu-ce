@@ -23,17 +23,13 @@ def generate_dictionary():
         
         def_offset = len(string_table_bytes)
         string_table_bytes.extend(definition.encode("utf-8"))
-        string_table_bytes.append(0) 
+        string_table_bytes.append(0)
         
         word_entries.append(f'    {{ "{word}", {i}, {def_offset} }}')
-        
-    formatted_string_table = "".join(
-        '\\"' if b == ord('"') else
-        '\\\\' if b == ord('\\') else
-        chr(b) if 32 <= b <= 126 else
-        f'\\{b:03o}'
-        for b in string_table_bytes
-    )
+
+    # bytearray(b"...") is 12 chars from the start and two chars at the end
+    # replace \x00 with \000 because \x00 bleeds into next letter if valid hex
+    formatted_string_table = repr(string_table_bytes)[12:-2].replace(r"\x00",r"\000")
 
     word_count = len(word_entries)
     entries_formatted = ",\n".join(word_entries)
