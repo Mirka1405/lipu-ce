@@ -25,7 +25,7 @@ def generate_glyphs():
     # 1bpp bitmap format
     canvas = Image.new('1', (GLYPH_WIDTH, GLYPH_HEIGHT), color=(0))
     draw = ImageDraw.Draw(canvas)
-    t = f"static const unsigned char bitmap_glyphs[{len(ucsur_chars)}][{BYTES_PER_IMAGE}] = ""{\n"
+    t = f"const unsigned char bitmap_glyphs[{len(ucsur_chars)}][{BYTES_PER_IMAGE}] = ""{\n"
     t2 = f"""#ifndef bitmap_include_file
 #define bitmap_include_file
 #ifdef __cplusplus
