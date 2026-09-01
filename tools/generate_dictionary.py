@@ -27,26 +27,9 @@ def generate_dictionary():
         
         word_entries.append(f'    {{ "{word}", {i}, {def_offset} }}')
 
-    # # old behaviour
-    # import time
-    # t1 = time.time()
-    # add_backslash = (ord('"'),ord('\\'))
-    # formatted_string_table = "".join(
-    #     f'\\{chr(b)}' if b in add_backslash else
-    #     chr(b) if 32 <= b <= 126 else
-    #     f'\\{b:03o}'
-    #     for b in string_table_bytes
-    # )
-    # t2 = time.time()
-    # print(t2-t1) # time = 0.0005786418914794922
-
-    # # bytearray(b"...") is 12 chars from the start and two chars at the end
-    # t1 = time.time()
-    formatted_string_table = repr(string_table_bytes)[12:-2].replace(r"\x00",r"\000") # replace \x00 with \000 because \x00 bleeds into next letter if valid hex
-    # t2 = time.time()
-    # print(t2-t1) # time = 2.3365020751953125e-05 (~25x faster)
-    # (why am i benchmarking 0.5 millisecond and 0.02 millisecond of compile time bro...)
-
+    # bytearray(b"...") is 12 chars from the start and two chars at the end
+    # replace \x00 with \000 because \x00 bleeds into next letter if valid hex
+    formatted_string_table = repr(string_table_bytes)[12:-2].replace(r"\x00",r"\000")
 
     word_count = len(word_entries)
     entries_formatted = ",\n".join(word_entries)
