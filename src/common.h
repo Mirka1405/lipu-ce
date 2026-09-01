@@ -12,6 +12,11 @@
 #include "bitmap/gen_bitmap_glyphs.h"
 
 extern void drawBitmapSprite_NoClip(const uint8_t sprite[BYTES_PER_GLYPH], int x, int y, uint8_t scale_x, uint8_t scale_y);
+
+#ifndef VERSION_NO
+#define VERSION_NO "v0.0"
+#endif
+
 void gfx_PrintStringXYWrapped(const char *str, int x, int y, int max_width, int line_height);
 const char *getDefinition(const word_entry_t *entry);
 
