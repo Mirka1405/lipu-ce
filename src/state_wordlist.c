@@ -6,6 +6,8 @@
 #define BOX_MARGIN 5
 #define MAX_WORDS_SHOWN 5
 
+static uint8_t ALPHABET_KEY_LOOKUP[TOKI_PONA_ALPHABET_SIZE] = {sk_Math, sk_Sin, sk_Square, sk_Comma, sk_LParen, sk_RParen, sk_Div, sk_Log, sk_7, sk_8, sk_Ln, sk_4, sk_5, sk_Sub};
+
 static int selected_word = 0;
 static int wordlist_start_idx = 0;
 
@@ -35,6 +37,25 @@ static void selectPrevWord(void)
     if (selected_word < wordlist_start_idx)
         wordlist_start_idx--;
     redraw();
+}
+
+static void jumpToLetter(uint8_t key)
+{
+    for (int i = 0; i < TOKI_PONA_ALPHABET_SIZE; i++)
+        if (key == ALPHABET_KEY_LOOKUP[i])
+        {
+            int new_idx = g_dictionary.letter_index[i];
+            selected_word = new_idx;
+            wordlist_start_idx = new_idx;
+
+            // scroll back up if needed
+            if (wordlist_start_idx > g_dictionary.word_count - MAX_WORDS_SHOWN)
+                wordlist_start_idx = g_dictionary.word_count - MAX_WORDS_SHOWN;
+
+            redraw();
+
+            break;
+        }
 }
 
 static void enterCurrentWordOverview(void)
@@ -98,6 +119,7 @@ static void step(void)
             enterCurrentWordOverview();
             break;
         default:
+            jumpToLetter(pressed_key);
             break;
         }
     }
