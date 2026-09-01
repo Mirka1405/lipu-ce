@@ -1,5 +1,6 @@
 #include "state_wordlist.h"
 #include "state_wordoverview.h"
+#include "state_about.h"
 
 #define WORD_LIST_START_Y 25
 #define WORD_BOX_HEIGHT 40
@@ -109,6 +110,9 @@ static void step(void)
         case sk_Clear:
             states_EnterState(NULL);
             break;
+        case sk_Mode:
+            states_EnterState(&STATE_ABOUT);
+            break;
         case sk_Down:
             selectNextWord();
             break;
@@ -135,6 +139,8 @@ static void redraw(void)
     gfx_FillRectangle_NoClip(0, 0, GFX_LCD_WIDTH, 20);
     gfx_SetTextFGColor(0xFF);
     gfx_PrintStringXY("lipu CE", 5, 5);
+    // dunno how okay it is to hardcode ui pos but meh
+    gfx_PrintStringXY("[mode] About menu", 197, 5);
 
     // draw word list
     gfx_SetTextConfig(gfx_text_clip);
