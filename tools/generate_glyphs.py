@@ -29,7 +29,7 @@ def generate_glyphs():
     t2 = f"""#ifndef bitmap_include_file
 #define bitmap_include_file
 #ifdef __cplusplus
-extern "C" """"{""""
+extern "C" """"{"f"""
 #endif
 extern const unsigned char bitmap_glyphs[{len(ucsur_chars)}][{BYTES_PER_IMAGE}];"""
     for i, code in enumerate(ucsur_chars):
