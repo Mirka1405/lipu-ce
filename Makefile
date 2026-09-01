@@ -1,12 +1,13 @@
 NAME = LIPUCE
 DESCRIPTION = "lipu CE - toki pona dictionary"
 ICON = icon.png
+VERSION_NO = "v1.0"
 
 ARCHIVED = YES
 COMPRESSED = YES
 COMPRESSED_MODE = zx0
 
-CFLAGS = -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -Oz -DVERSION_NO=' $(VERSION_NO) '
 CXXFLAGS = -Wall -Wextra -Oz
 
 DEPS = $(SRCDIR)/dictionary_data.c

@@ -1,6 +1,8 @@
 #ifndef __DICTIONARY_DATA_H__
 #define __DICTIONARY_DATA_H__
 
+#define TOKI_PONA_ALPHABET_SIZE 14
+
 #include <stdint.h>
 
 typedef struct
@@ -15,6 +17,7 @@ typedef struct
     int word_count;
     const word_entry_t *words;
     const char *def_string_table;
+    const int letter_index[TOKI_PONA_ALPHABET_SIZE];
 } dictionary_db_t;
 
 extern const dictionary_db_t g_dictionary;
