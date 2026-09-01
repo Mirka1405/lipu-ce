@@ -1,5 +1,10 @@
 #include "common.h"
+// A glyph is 12x12 in size, so this format uses 144 bits, or 18 bytes.
+#define BYTES_PER_GLYPH 18
+#define GLYPH_SIZE 12
+#define GLYPH_COLOR 0 // black if default palette is unchanged
 
+// legacy
 void gfx_ScaledRLETSprite_NoClip(const gfx_rletsprite_t *sprite, int x, int y, uint8_t scale_x, uint8_t scale_y)
 {
     const uint8_t *data = sprite->data;
@@ -45,6 +50,35 @@ void gfx_ScaledRLETSprite_NoClip(const gfx_rletsprite_t *sprite, int x, int y, u
             data += count;
             col += count;
         }
+    }
+}
+
+void drawBitmapSprite(const uint8_t sprite[BYTES_PER_GLYPH], int x, int y, uint8_t scale_x, uint8_t scale_y){
+    /* how this works:
+    we start with a mask of 1
+    we shift it left by one position and use it to get a bit out of a byte
+    when the mask is 0; this means that we are done with this byte and move on to the next
+    */
+    uint8_t mask = 1;
+    uint8_t sprite_index = 0;
+    gfx_SetColor(GLYPH_COLOR);
+    for(uint8_t row=0;y<GLYPH_SIZE;row++){
+        uint8_t run_len = 0;
+        for(uint8_t col=0;x<GLYPH_SIZE;col++){
+            if(mask==0){mask=1;sprite_index++;}
+            if(sprite[sprite_index]&mask)run_len++;
+            else gfx_FillRectangle_NoClip(
+                    x + (col-run_len)*scale_x,
+                    y + row*scale_y,
+                    run_len*scale_x,
+                    scale_y);
+            mask<<=1;
+        }
+        gfx_FillRectangle_NoClip(
+            x + (GLYPH_SIZE-run_len)*scale_x,
+            y + row*scale_y,
+            run_len*scale_x,
+            scale_y);
     }
 }
 
